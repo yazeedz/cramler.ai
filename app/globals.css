@@ -1,0 +1,913 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Linux Libertine font faces - download from https://www.dafont.com/linux-libertine.font */
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('/fonts/LinLibertine_R.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('/fonts/LinLibertine_RI.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('/fonts/LinLibertine_RB.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('/fonts/LinLibertine_RBI.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Linux Libertine Display - for headings and larger text */
+@font-face {
+  font-family: 'Linux Libertine Display';
+  src: url('/fonts/LinLibertine_DR.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Linux Libertine Initials - decorative capitals */
+@font-face {
+  font-family: 'Linux Libertine Initials';
+  src: url('/fonts/LinLibertine_I.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Linux Libertine Small Caps */
+@font-face {
+  font-family: 'Linux Libertine Small Caps';
+  src: url('/fonts/LinLibertine_aS.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 33.3% 97.1%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+
+    --bg-100: 48 33.3% 97.1%;
+
+    --font-heebo: 'Heebo', sans-serif;
+    --font-source-serif: 'Source Serif 4', serif;
+    --font-lora: 'Lora', serif;
+    --font-tinos: 'Tinos', serif;
+    --font-linux-libertine: 'Linux Libertine', serif;
+    --font-linux-libertine-display: 'Linux Libertine Display', serif;
+    --font-linux-libertine-initials: 'Linux Libertine Initials', serif;
+    --font-linux-libertine-small-caps: 'Linux Libertine Small Caps', serif;
+
+    /* Sidebar variables */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 10.6% 64.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    --bg-100: 222.2 84% 4.9%;
+
+    /* Sidebar variables for dark mode */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 94.1%;
+    --sidebar-primary-foreground: 220.9 39.3% 11%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 10.6% 64.9%;
+
+    --always-white: 0 0% 100%;
+    --always-black: 0 0% 0%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply text-foreground;
+  }
+}
+
+/* Cramler theme - placed after @layer base to ensure higher specificity */
+[data-theme=cramler], [data-theme=cramler][data-mode=light] {
+    --accent-brand: 15 63.1% 59.6%;
+    --accent-main-000: 15 55.6% 52.4%;
+    --accent-main-100: 15 55.6% 52.4%;
+    --accent-main-200: 15 63.1% 59.6%;
+    --accent-main-900: 0 0% 0%;
+    --accent-pro-000: 251 34.2% 33.3%;
+    --accent-pro-100: 251 40% 45.1%;
+    --accent-pro-200: 251 61% 72.2%;
+    --accent-pro-900: 253 33.3% 91.8%;
+    --accent-secondary-000: 210 73.7% 40.2%;
+    --accent-secondary-100: 210 70.9% 51.6%;
+    --accent-secondary-200: 210 70.9% 51.6%;
+    --accent-secondary-900: 211 72% 90%;
+    --bg-000: 0 0% 100%;
+    --bg-100: 48 33.3% 97.1%;
+    --bg-200: 53 28.6% 94.5%;
+    --bg-300: 48 25% 92.2%;
+    --bg-400: 50 20.7% 88.6%;
+    --bg-500: 50 20.7% 88.6%;
+    --border-100: 30 3.3% 11.8%;
+    --border-200: 30 3.3% 11.8%;
+    --border-300: 30 3.3% 11.8%;
+    --border-400: 30 3.3% 11.8%;
+    --danger-000: 0 61.4% 22.4%;
+    --danger-100: 0 58.6% 34.1%;
+    --danger-200: 0 58.6% 34.1%;
+    --danger-900: 0 50% 95%;
+    --oncolor-100: 0 0% 100%;
+    --oncolor-200: 60 6.7% 97.1%;
+    --oncolor-300: 60 6.7% 97.1%;
+    --text-000: 60 2.6% 7.6%;
+    --text-100: 60 2.6% 7.6%;
+    --text-200: 60 2.5% 23.3%;
+    --text-300: 60 2.5% 23.3%;
+    --text-400: 51 3.1% 43.7%;
+    --text-500: 51 3.1% 43.7%;
+}
+
+/* Auto-generated background utilities for cramler theme */
+.bg-bg-000 { background-color: hsl(var(--bg-000)); }
+.bg-bg-100 { background-color: hsl(var(--bg-100)); }
+.bg-bg-200 { background-color: hsl(var(--bg-200)); }
+.bg-bg-300 { background-color: hsl(var(--bg-300)); }
+.bg-bg-400 { background-color: hsl(var(--bg-400)); }
+.bg-bg-500 { background-color: hsl(var(--bg-500)); }
+
+/* Explicit hover styles for debugging */
+.hover\:bg-bg-100:hover { 
+  background-color: hsl(var(--bg-100)) !important; 
+}
+.hover\:bg-bg-200:hover { 
+  background-color: hsl(var(--bg-200)) !important; 
+}
+.hover\:bg-bg-300:hover { 
+  background-color: hsl(var(--bg-300)) !important; 
+} 
+.hover\:bg-bg-400:hover { 
+  background-color: hsl(var(--bg-400)) !important; 
+}
+.hover\:bg-bg-500:hover { 
+  background-color: hsl(var(--bg-500)) !important; 
+}
+.hover\:bg-bg-000:hover { 
+  background-color: hsl(var(--bg-000)) !important; 
+}
+
+/* Group hover styles for dropdown interaction - only for non-active items */
+.group\/item:not(.active):has(.group\/dropdown:hover) {
+  background-color: hsl(var(--bg-200)) !important;
+}
+
+/* Active items should always maintain bg-bg-400 */
+.group\/item.active {
+  background-color: hsl(var(--bg-400)) !important;
+}
+.from-bg-200 {
+  --tw-gradient-from: hsl(var(--bg-200) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-200) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.bg-text-000 { background-color: hsl(var(--text-000)); }
+.bg-text-100 { background-color: hsl(var(--text-100)); }
+.bg-text-200 { background-color: hsl(var(--text-200)); }
+.bg-text-300 { background-color: hsl(var(--text-300)); }
+.bg-text-400 { background-color: hsl(var(--text-400)); }
+.bg-text-500 { background-color: hsl(var(--text-500)); }
+
+.bg-accent-brand { background-color: hsl(var(--accent-brand)); }
+.bg-accent-main-000 { background-color: hsl(var(--accent-main-000)); }
+.bg-accent-main-100 { background-color: hsl(var(--accent-main-100)); }
+.bg-accent-main-200 { background-color: hsl(var(--accent-main-200)); }
+.bg-accent-main-900 { background-color: hsl(var(--accent-main-900)); }
+
+.bg-accent-pro-000 { background-color: hsl(var(--accent-pro-000)); }
+.bg-accent-pro-100 { background-color: hsl(var(--accent-pro-100)); }
+.bg-accent-pro-200 { background-color: hsl(var(--accent-pro-200)); }
+.bg-accent-pro-900 { background-color: hsl(var(--accent-pro-900)); }
+
+.bg-accent-secondary-000 { background-color: hsl(var(--accent-secondary-000)); }
+.bg-accent-secondary-100 { background-color: hsl(var(--accent-secondary-100)); }
+.bg-accent-secondary-200 { background-color: hsl(var(--accent-secondary-200)); }
+.bg-accent-secondary-900 { background-color: hsl(var(--accent-secondary-900)); }
+
+.bg-border-100 { background-color: hsl(var(--border-100)); }
+.bg-border-200 { background-color: hsl(var(--border-200)); }
+.bg-border-300 { background-color: hsl(var(--border-300)); }
+.bg-border-400 { background-color: hsl(var(--border-400)); }
+
+.bg-danger-000 { background-color: hsl(var(--danger-000)); }
+.bg-danger-100 { background-color: hsl(var(--danger-100)); }
+.bg-danger-200 { background-color: hsl(var(--danger-200)); }
+.bg-danger-900 { background-color: hsl(var(--danger-900)); }
+
+.bg-oncolor-100 { background-color: hsl(var(--oncolor-100)); }
+.bg-oncolor-200 { background-color: hsl(var(--oncolor-200)); }
+.bg-oncolor-300 { background-color: hsl(var(--oncolor-300)); }
+
+/* Auto-generated gradient utilities for cramler theme */
+/* Background gradients */
+.from-bg-000 {
+  --tw-gradient-from: hsl(var(--bg-000) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-000) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-000 {
+  --tw-gradient-to: hsl(var(--bg-000) / 1) var(--tw-gradient-to-position);
+}
+
+.from-bg-100 {
+  --tw-gradient-from: hsl(var(--bg-100) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-100) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-100 {
+  --tw-gradient-to: hsl(var(--bg-100) / 1) var(--tw-gradient-to-position);
+}
+
+.from-bg-200 {
+  --tw-gradient-from: hsl(var(--bg-200) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-200) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-200 {
+  --tw-gradient-to: hsl(var(--bg-200) / 1) var(--tw-gradient-to-position);
+}
+
+.from-bg-300 {
+  --tw-gradient-from: hsl(var(--bg-300) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-300) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-300 {
+  --tw-gradient-to: hsl(var(--bg-300) / 1) var(--tw-gradient-to-position);
+}
+
+.from-bg-400 {
+  --tw-gradient-from: hsl(var(--bg-400) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-400) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-400 {
+  --tw-gradient-to: hsl(var(--bg-400) / 1) var(--tw-gradient-to-position);
+}
+
+.from-bg-500 {
+  --tw-gradient-from: hsl(var(--bg-500) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--bg-500) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-bg-500 {
+  --tw-gradient-to: hsl(var(--bg-500) / 1) var(--tw-gradient-to-position);
+}
+
+/* Text colors */
+.text-text-000 { color: hsl(var(--text-000)); }
+.text-text-100 { color: hsl(var(--text-100)); }
+.text-text-200 { color: hsl(var(--text-200)); }
+.text-text-300 { color: hsl(var(--text-300)); }
+.text-text-400 { color: hsl(var(--text-400)); }
+.text-text-500 { color: hsl(var(--text-500)); }
+
+/* Accent colors */
+.text-accent-brand { color: hsl(var(--accent-brand)); }
+.text-accent-main-000 { color: hsl(var(--accent-main-000)); }
+.text-accent-main-100 { color: hsl(var(--accent-main-100)); }
+.text-accent-main-200 { color: hsl(var(--accent-main-200)); }
+.text-accent-main-900 { color: hsl(var(--accent-main-900)); }
+
+/* Text color gradients */
+.from-text-000 {
+  --tw-gradient-from: hsl(var(--text-000) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-000) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-000 {
+  --tw-gradient-to: hsl(var(--text-000) / 1) var(--tw-gradient-to-position);
+}
+
+.from-text-100 {
+  --tw-gradient-from: hsl(var(--text-100) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-100) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-100 {
+  --tw-gradient-to: hsl(var(--text-100) / 1) var(--tw-gradient-to-position);
+}
+
+.from-text-200 {
+  --tw-gradient-from: hsl(var(--text-200) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-200) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-200 {
+  --tw-gradient-to: hsl(var(--text-200) / 1) var(--tw-gradient-to-position);
+}
+
+.from-text-300 {
+  --tw-gradient-from: hsl(var(--text-300) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-300) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-300 {
+  --tw-gradient-to: hsl(var(--text-300) / 1) var(--tw-gradient-to-position);
+}
+
+.from-text-400 {
+  --tw-gradient-from: hsl(var(--text-400) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-400) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-400 {
+  --tw-gradient-to: hsl(var(--text-400) / 1) var(--tw-gradient-to-position);
+}
+
+.from-text-500 {
+  --tw-gradient-from: hsl(var(--text-500) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--text-500) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-text-500 {
+  --tw-gradient-to: hsl(var(--text-500) / 1) var(--tw-gradient-to-position);
+}
+
+/* Accent color gradients */
+.from-accent-brand {
+  --tw-gradient-from: hsl(var(--accent-brand) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--accent-brand) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-accent-brand {
+  --tw-gradient-to: hsl(var(--accent-brand) / 1) var(--tw-gradient-to-position);
+}
+
+.from-accent-main-000 {
+  --tw-gradient-from: hsl(var(--accent-main-000) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--accent-main-000) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-accent-main-000 {
+  --tw-gradient-to: hsl(var(--accent-main-000) / 1) var(--tw-gradient-to-position);
+}
+
+.from-accent-main-100 {
+  --tw-gradient-from: hsl(var(--accent-main-100) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--accent-main-100) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-accent-main-100 {
+  --tw-gradient-to: hsl(var(--accent-main-100) / 1) var(--tw-gradient-to-position);
+}
+
+.from-accent-main-200 {
+  --tw-gradient-from: hsl(var(--accent-main-200) / 1) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--accent-main-200) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-accent-main-200 {
+  --tw-gradient-to: hsl(var(--accent-main-200) / 1) var(--tw-gradient-to-position);
+}
+
+.font-heebo {
+  font-family: var(--font-heebo);
+}
+
+.font-source-serif {
+  font-family: var(--font-source-serif);
+}
+
+.font-lora {
+  font-family: var(--font-lora);
+}
+
+.font-tinos {
+  font-family: var(--font-tinos);
+}
+
+.font-linux-libertine {
+  font-family: var(--font-linux-libertine);
+}
+
+.font-linux-libertine-display {
+  font-family: var(--font-linux-libertine-display);
+}
+
+.font-linux-libertine-initials {
+  font-family: var(--font-linux-libertine-initials);
+}
+
+.font-linux-libertine-small-caps {
+  font-family: var(--font-linux-libertine-small-caps);
+}
+
+*[dir="rtl"] {
+  font-family: var(--font-heebo);
+}
+
+/* Update the selection rules */
+*:not([data-rendered-text="true"]):not([data-rendered-text="true"] span) {
+  user-select: none;
+}
+
+[data-rendered-text="true"],
+[data-rendered-text="true"] span {
+  user-select: text;
+}
+
+/* Keep existing highlight styles */
+[data-rendered-text="true"] span[data-highlight-intensity] {
+  transition: background-color 0.2s ease;
+}
+
+[data-highlight-intensity="1"] {
+  background-color: rgba(253, 224, 71, 0.3);
+}
+
+[data-highlight-intensity="2"] {
+  background-color: rgba(253, 224, 71, 0.5);
+}
+
+[data-highlight-intensity="3"] {
+  background-color: rgba(253, 224, 71, 0.7);
+}
+
+[data-highlight-intensity="4"] {
+  background-color: rgba(253, 224, 71, 0.9);
+}
+
+/* Global minimalist scrollbar styles for all elements */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5); /* gray-400 with opacity */
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8); /* darker on hover */
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Global Firefox scrollbar */
+* {
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-width: thin;
+}
+
+/* Dark mode global scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5); /* gray-600 with opacity */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.8); /* darker on hover */
+}
+
+.dark * {
+  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+}
+
+/* Custom scrollbar styles for specific components (legacy support) */
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5); /* gray-400 with opacity */
+  border-radius: 3px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8); /* darker on hover */
+}
+
+/* For Firefox */
+.scrollbar-track-transparent {
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-width: thin;
+}
+
+/* Dark mode scrollbar */
+.dark .scrollbar-track-transparent::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5); /* gray-600 with opacity */
+}
+
+.dark .scrollbar-track-transparent::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.8); /* darker on hover */
+}
+
+.dark .scrollbar-track-transparent {
+  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+}
+
+/* Shepherd.js Tour Styles */
+.shepherd-modal-overlay-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9998 !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important; /* Keep background transparent */
+  opacity: 0.5 !important;
+}
+
+.shepherd-modal {
+  position: fixed !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent any layout shifts when modal is visible */
+.shepherd-modal-is-visible {
+  /* Override any potential margin/padding changes */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Make the modal overlay completely transparent but highlight target elements */
+.shepherd-modal-overlay-container svg {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  display: block !important;
+}
+
+/* Make the overlay mask transparent instead of dark */
+.shepherd-modal-overlay-container svg path {
+  fill: rgba(0, 0, 0, 0.1) !important; /* Very light overlay instead of dark */
+}
+
+/* Ensure highlighted elements remain visible and clickable */
+.shepherd-enabled.shepherd-target {
+  z-index: 9999 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Custom tour highlighting for dropdowns */
+.tour-highlight-dropdown {
+  position: relative !important;
+  z-index: 10000 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+  border-radius: 8px !important;
+  background: white !important;
+  border: 2px solid rgba(59, 130, 246, 0.8) !important;
+}
+
+/* Additional targeting for Radix UI dropdowns */
+[data-radix-dropdown-content].tour-highlight-dropdown,
+[data-radix-popper-content-wrapper] .tour-highlight-dropdown {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.7) !important;
+  background: white !important;
+  border: 2px solid rgba(59, 130, 246, 1) !important;
+}
+
+/* Ensure dropdown triggers remain clickable during tour */
+#tag-selector button,
+#collection-selector button,
+#status-selector button,
+#package-selector-section button {
+  pointer-events: auto !important;
+  z-index: 10001 !important;
+}
+
+/* Ensure dropdowns appear above tour elements */
+[data-radix-dropdown-content],
+[data-radix-popper-content-wrapper] {
+  z-index: 10002 !important;
+}
+
+.shepherd-element {
+  background: hsl(var(--bg-000));
+  border: 1px solid hsl(var(--border-200));
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-manrope), sans-serif;
+  max-width: 400px;
+  z-index: 10000;
+}
+
+.shepherd-content {
+  padding: 0;
+}
+
+.shepherd-header {
+  background: hsl(var(--accent-brand));
+  border-radius: 12px 12px 0 0;
+  padding: 16px 20px;
+  margin: 0;
+}
+
+/* RTL support for Hebrew tour headers */
+.shepherd-header:has(.shepherd-title:lang(he)),
+.shepherd-header:has(.shepherd-title[dir="rtl"]) {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Detect Hebrew text automatically */
+.shepherd-title:lang(he),
+.shepherd-title[dir="rtl"],
+.shepherd-title:has([lang="he"]) {
+  direction: rtl;
+  text-align: right;
+}
+
+.shepherd-title {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.shepherd-text {
+  padding: 20px;
+  color: hsl(var(--text-200));
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* RTL support for Hebrew tour text */
+.shepherd-text:lang(he),
+.shepherd-text[dir="rtl"],
+.shepherd-text:has([lang="he"]) {
+  direction: rtl;
+  text-align: right;
+}
+
+.shepherd-text p {
+  margin-bottom: 12px;
+}
+
+.shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-text ul {
+  margin: 8px 0;
+}
+
+.shepherd-text li {
+  margin-bottom: 4px;
+}
+
+.shepherd-footer {
+  background: hsl(var(--bg-100));
+  border-radius: 0 0 12px 12px;
+  border-top: 1px solid hsl(var(--border-200));
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* RTL support for Hebrew tour footer */
+.shepherd-footer[dir="rtl"] {
+  flex-direction: row-reverse;
+}
+
+.shepherd-button {
+  background: hsl(var(--accent-brand));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.shepherd-button:hover {
+  background: hsl(var(--accent-main-000));
+  transform: translateY(-1px);
+}
+
+.shepherd-button.shepherd-button-secondary {
+  background: transparent;
+  border: 1px solid hsl(var(--border-300));
+  color: hsl(var(--text-300));
+}
+
+.shepherd-button.shepherd-button-secondary:hover {
+  background: hsl(var(--bg-200));
+  border-color: hsl(var(--border-400));
+  transform: translateY(-1px);
+}
+
+.shepherd-cancel-icon {
+  background: transparent;
+  border: none;
+  color: hsl(var(--text-400));
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  transition: color 0.2s ease;
+}
+
+/* RTL support for Hebrew tour close button */
+.shepherd-header[dir="rtl"] .shepherd-cancel-icon {
+  right: auto;
+  left: 12px;
+}
+
+.shepherd-cancel-icon:hover {
+  color: hsl(var(--text-200));
+}
+
+.shepherd-arrow:before {
+  background: hsl(var(--bg-000));
+  border: 1px solid hsl(var(--border-200));
+}
+
+/* Tour specific button styles */
+.btn-primary {
+  background: hsl(var(--accent-brand)) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background: hsl(var(--accent-main-000)) !important;
+}
+
+.btn-secondary {
+  background: transparent !important;
+  border: 1px solid hsl(var(--border-300)) !important;
+  color: hsl(var(--text-300)) !important;
+}
+
+.btn-secondary:hover {
+  background: hsl(var(--bg-200)) !important;
+  border-color: hsl(var(--border-400)) !important;
+}
+
+/* Dark mode support for tours */
+.dark .shepherd-element {
+  background: hsl(var(--bg-000));
+  border-color: hsl(var(--border-300));
+}
+
+.dark .shepherd-header {
+  background: hsl(var(--accent-pro-000));
+}
+
+.dark .shepherd-text {
+  color: hsl(var(--text-100));
+}
+
+.dark .shepherd-footer {
+  background: hsl(var(--bg-200));
+  border-color: hsl(var(--border-300));
+}
+
+.dark .btn-secondary {
+  color: hsl(var(--text-200)) !important;
+}
+
+/* TipTap custom styles - prevent extra spacing on selected nodes */
+.ProseMirror .ProseMirror-selectednode {
+  outline: none !important;
+}
+
+.ProseMirror .ProseMirror-selectednode::after,
+.ProseMirror .ProseMirror-selectednode::before {
+  display: none !important;
+}
+
+/* Ensure react-renderer nodes don't add extra spacing when selected */
+.ProseMirror .react-renderer.node-imageMarker.ProseMirror-selectednode,
+.ProseMirror .react-renderer.node-tableMarker.ProseMirror-selectednode {
+  display: inline-flex !important;
+  vertical-align: baseline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Prevent trailing breaks after image/table markers from adding visible spacing */
+.ProseMirror .react-renderer + br.ProseMirror-trailingBreak,
+.ProseMirror .node-imageMarker + br.ProseMirror-trailingBreak,
+.ProseMirror .node-tableMarker + br.ProseMirror-trailingBreak {
+  display: none !important;
+}

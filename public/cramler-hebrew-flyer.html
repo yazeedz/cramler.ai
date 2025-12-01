@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cramler - חבילת שאלות לסטודנטים לרפואה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0050CC;
+            --secondary: #FF3366;
+            --light: #F6F9FC;
+            --dark: #1A1F36;
+            --text: #424770;
+            --text-light: #8898AA;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rubik', 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: var(--text);
+            line-height: 1.5;
+            padding: 15px;
+        }
+        
+        .flyer {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #e8e6dc;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .free-banner {
+            position: absolute;
+            top: 10px;
+            right: -40px;
+            background: var(--dark);
+            color: white;
+            padding: 12px 55px;
+            transform: rotate(45deg);
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+            z-index: 10;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            clip-path: polygon(0 10%, 4% 0%, 8% 10%, 12% 0%, 16% 10%, 20% 0%, 24% 10%, 28% 0%, 32% 10%, 36% 0%, 40% 10%, 44% 0%, 48% 10%, 52% 0%, 56% 10%, 60% 0%, 64% 10%, 68% 0%, 72% 10%, 76% 0%, 80% 10%, 84% 0%, 88% 10%, 92% 0%, 96% 10%, 100% 0%, 100% 90%, 96% 100%, 92% 90%, 88% 100%, 84% 90%, 80% 100%, 76% 90%, 72% 100%, 68% 90%, 64% 100%, 60% 90%, 56% 100%, 52% 90%, 48% 100%, 44% 90%, 40% 100%, 36% 90%, 32% 100%, 28% 90%, 24% 100%, 20% 90%, 16% 100%, 12% 90%, 8% 100%, 4% 90%, 0% 100%);
+        }        
+        .header {
+            background: #f5f4ed;
+            color: var(--dark);
+            padding: 20px 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-family: 'Lora', serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: var(--text);
+        }
+        
+        .main-content {
+            padding: 25px 25px;
+        }
+        
+        .offer-box {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .offer-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+        
+        .offer-description {
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .coupon-code {
+            background: var(--dark);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        
+        .coupon-code:hover {
+            background: #2d3748;
+        }
+        
+        .coupon-code:active {
+            transform: translateY(1px);
+        }
+        
+        .copy-notification {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .copy-notification.show {
+            opacity: 1;
+        }
+        
+        .copy-notification::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--dark);
+        }
+        
+        .free-badge {
+            background: #2d3748;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .features {
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .feature-icon::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .feature-text {
+            font-size: 14px;
+            color: var(--text);
+        }
+        
+        .feedback-section {
+            background: rgba(255, 255, 255, 0.4);
+            border-right: 3px solid var(--dark);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 18px 0;
+        }
+        
+        .feedback-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .feedback-text {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        
+        .contact-info {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .email {
+            color: var(--text-light);
+            font-weight: 400;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--dark);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="flyer">
+        <div class="free-banner">FREE</div>
+        <div class="header">
+            <div class="logo">Cramler</div>
+            <div class="subtitle">פלטפורמת הכנה לבחינות עם בינה מלאכותית</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="offer-box">
+                <div class="offer-title">🎓 חבילה מיוחדת לבחינת יק״ר</div>
+                <div class="offer-description">
+                    חבילת יק״ר עם כ-1000 שאלות מתויגות ופתרונות מלאים מצוטטים היטב מהספר הריסון עם סימוכין מלא
+                    <br><br>
+                    <strong>תלמדו עכשיו בחינם!</strong>
+                </div>
+                <div class="coupon-code" onclick="copyToClipboard('TAUMED2025', this)" title="לחץ להעתקה">
+                    TAUMED2025
+                    <div class="copy-notification">הועתק!</div>
+                </div>
+                <div class="free-badge">קוד קופון לחבילת יק״ר - 100% הנחה</div>
+            </div>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon"></div>
+                    <div class="feature-text">כ-1000 שאלות אמיתיות מבחינות יק״ר</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"></div>
+                    <div class="feature-text">גישה לזמן מוגבל - נצלו עכשיו!</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"></div>
+                    <div class="feature-text">מעקב אחר התקדמות ונקודות חולשה</div>
+                </div>
+            </div>
+            
+            <div class="feedback-section">
+                <div class="feedback-title">💬 נשמח לקבל את המשוב שלכם!</div>
+                <div class="feedback-text">
+                    אנחנו מבקשים שיהיה לכם פידבק תוך כדי השימוש כדי שנוכל להשתפר.
+                    <br>
+                    אם יש לכם רעיונות לפיצ'רים שיעזרו לכם ללמוד בצורה יותר יעילה, נשמח לשמוע!
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="https://cramler.com" class="cta-button">התחילו ללמוד עכשיו - cramler.com</a>
+            </div>
+            
+            <div class="contact-info">
+                <a href="mailto:support@cramler.com" class="email">support@cramler.com</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(text, element) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show notification
+                const notification = element.querySelector('.copy-notification');
+                notification.classList.add('show');
+                
+                // Hide notification after 2 seconds
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                }, 2000);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show notification
+                const notification = element.querySelector('.copy-notification');
+                notification.classList.add('show');
+                
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

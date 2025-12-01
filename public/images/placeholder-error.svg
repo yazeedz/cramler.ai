@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+  <rect width="300" height="200" fill="#FEF2F2" />
+  <rect x="10" y="10" width="280" height="180" fill="#FEF2F2" stroke="#DC2626" stroke-width="2" rx="10" />
+  <text x="150" y="80" font-family="Arial" font-size="18" fill="#DC2626" text-anchor="middle">Error Loading Image</text>
+  <circle cx="150" cy="120" r="20" fill="none" stroke="#DC2626" stroke-width="3" />
+  <path d="M145,115 L155,125 M145,125 L155,115" stroke="#DC2626" stroke-width="3" />
+</svg> 

@@ -1,0 +1,97 @@
+<svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="20" y="16" width="480" height="300" rx="16" fill="white"/>
+
+  
+  <!-- Grid lines -->
+  <defs>
+    <pattern id="grid" width="50" height="25" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 25" fill="none" stroke="#e9ecef" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" x="80" y="60" fill="url(#grid)"/>
+  
+  <!-- Y-axis labels -->
+  <text x="70" y="70" font-family="Arial, sans-serif" font-size="12" fill="#6c757d" text-anchor="end">100%</text>
+  <text x="70" y="120" font-family="Arial, sans-serif" font-size="12" fill="#6c757d" text-anchor="end">75%</text>
+  <text x="70" y="170" font-family="Arial, sans-serif" font-size="12" fill="#6c757d" text-anchor="end">50%</text>
+  <text x="70" y="220" font-family="Arial, sans-serif" font-size="12" fill="#6c757d" text-anchor="end">25%</text>
+  <text x="70" y="270" font-family="Arial, sans-serif" font-size="12" fill="#6c757d" text-anchor="end">0%</text>
+  
+  <!-- Title -->
+  <text x="50" y="35" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#343a40">Infectious Disease Performance</text>
+  
+  <!-- Bars with hover effects -->
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <g>
+    <!-- Viral Infections (85%) -->
+    <rect x="90" y="90" width="60" height="170" fill="#4a90e2" rx="8" class="bar" filter="url(#shadow)">
+      <animate attributeName="height" values="0;170" dur="1s" begin="0s"/>
+      <animate attributeName="y" values="260;90" dur="1s" begin="0s"/>
+    </rect>
+    
+    <!-- Bacterial Infections (72%) -->
+    <rect x="170" y="116" width="60" height="144" fill="#50c878" rx="8" class="bar" filter="url(#shadow)">
+      <animate attributeName="height" values="0;144" dur="1s" begin="0.2s"/>
+      <animate attributeName="y" values="260;116" dur="1s" begin="0.2s"/>
+    </rect>
+    
+    <!-- Parasitic Diseases (68%) -->
+    <rect x="250" y="124" width="60" height="136" fill="#f39c12" rx="8" class="bar" filter="url(#shadow)">
+      <animate attributeName="height" values="0;136" dur="1s" begin="0.4s"/>
+      <animate attributeName="y" values="260;124" dur="1s" begin="0.4s"/>
+    </rect>
+    
+    <!-- Fungal Infections (61%) -->
+    <rect x="330" y="138" width="60" height="122" fill="#e74c3c" rx="8" class="bar" filter="url(#shadow)">
+      <animate attributeName="height" values="0;122" dur="1s" begin="0.6s"/>
+      <animate attributeName="y" values="260;138" dur="1s" begin="0.6s"/>
+    </rect>
+    
+    <!-- Antimicrobial Resistance (58%) -->
+    <rect x="410" y="144" width="60" height="116" fill="#9b59b6" rx="8" class="bar" filter="url(#shadow)">
+      <animate attributeName="height" values="0;116" dur="1s" begin="0.8s"/>
+      <animate attributeName="y" values="260;144" dur="1s" begin="0.8s"/>
+    </rect>
+  </g>
+  
+  <!-- Percentage labels on bars -->
+  <text x="120" y="85" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4a90e2" text-anchor="middle">85%</text>
+  <text x="200" y="111" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#50c878" text-anchor="middle">72%</text>
+  <text x="280" y="119" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#f39c12" text-anchor="middle">68%</text>
+  <text x="360" y="133" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c" text-anchor="middle">61%</text>
+  <text x="440" y="139" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#9b59b6" text-anchor="middle">58%</text>
+  
+  <!-- X-axis labels -->
+  <text x="120" y="285" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Viral</text>
+  <text x="120" y="298" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Infections</text>
+  
+  <text x="200" y="285" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Bacterial</text>
+  <text x="200" y="298" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Infections</text>
+  
+  <text x="280" y="285" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Parasitic</text>
+  <text x="280" y="298" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Diseases</text>
+  
+  <text x="360" y="285" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Fungal</text>
+  <text x="360" y="298" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Infections</text>
+  
+  <text x="440" y="285" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Antimicrobial</text>
+  <text x="440" y="298" font-family="Arial, sans-serif" font-size="12" fill="#495057" text-anchor="middle">Resistance</text>
+  
+
+  
+  <style>
+    .bar {
+      transition: opacity 0.2s;
+      cursor: pointer;
+    }
+    .bar:hover {
+      opacity: 0.8;
+    }
+  </style>
+</svg>
