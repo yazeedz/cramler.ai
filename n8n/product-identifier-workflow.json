@@ -1,0 +1,271 @@
+{
+  "name": "Product Identifier Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "identify-product",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "product-identifier"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "type": "system",
+              "content": "You are a product identification expert specializing in beauty, skincare, cosmetics, and pharmaceutical products. Given a product name, research and identify detailed information about it.\n\nYou must respond with a valid JSON object containing these fields:\n- product_name: The official/full product name\n- brand: The brand that makes this product\n- description: A brief description of the product (2-3 sentences)\n- price: Approximate price range (e.g., \"$15-25\" or \"$45\")\n- product_type: One of: beauty, pharma, cosmetics, skincare, haircare, fragrance, wellness\n- what_it_does: What the product does and its benefits (2-3 sentences)\n- main_category: Main category (e.g., skincare, haircare, makeup, body care)\n- sub_category: Specific subcategory (e.g., moisturizer, cleanser, serum, shampoo, lipstick)\n- main_difference: What makes this product unique or different from competitors\n- target_audience: Who this product is designed for\n- ingredients: Array of key/notable ingredients (top 5-8)\n- claims: Array of product claims/benefits\n\nRespond ONLY with the JSON object, no additional text."
+            },
+            {
+              "type": "user",
+              "content": "=Identify this product: {{ $json.body.product_name }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 1000
+        }
+      },
+      "id": "openai-agent",
+      "name": "OpenAI - Identify Product",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the AI response\nconst aiResponse = $input.first().json.message.content;\nconst productId = $('Webhook').first().json.body.product_id;\nconst userId = $('Webhook').first().json.body.user_id;\n\nlet productData;\ntry {\n  // Try to parse JSON from the response\n  productData = JSON.parse(aiResponse);\n} catch (e) {\n  // If parsing fails, try to extract JSON from the response\n  const jsonMatch = aiResponse.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    productData = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('Failed to parse AI response as JSON');\n  }\n}\n\nreturn {\n  json: {\n    product_id: productId,\n    user_id: userId,\n    ...productData,\n    status: 'ready'\n  }\n};"
+      },
+      "id": "parse-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "products",
+        "filters": {
+          "conditions": [
+            {
+              "column": "id",
+              "value": "={{ $json.product_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "string": [
+              {
+                "column": "name",
+                "value": "={{ $json.product_name }}"
+              },
+              {
+                "column": "brand",
+                "value": "={{ $json.brand }}"
+              },
+              {
+                "column": "description",
+                "value": "={{ $json.description }}"
+              },
+              {
+                "column": "price",
+                "value": "={{ $json.price }}"
+              },
+              {
+                "column": "product_type",
+                "value": "={{ $json.product_type }}"
+              },
+              {
+                "column": "what_it_does",
+                "value": "={{ $json.what_it_does }}"
+              },
+              {
+                "column": "main_category",
+                "value": "={{ $json.main_category }}"
+              },
+              {
+                "column": "sub_category",
+                "value": "={{ $json.sub_category }}"
+              },
+              {
+                "column": "main_difference",
+                "value": "={{ $json.main_difference }}"
+              },
+              {
+                "column": "target_audience",
+                "value": "={{ $json.target_audience }}"
+              },
+              {
+                "column": "status",
+                "value": "ready"
+              }
+            ],
+            "array": [
+              {
+                "column": "ingredients",
+                "value": "={{ $json.ingredients }}"
+              },
+              {
+                "column": "claims",
+                "value": "={{ $json.claims }}"
+              }
+            ]
+          }
+        },
+        "options": {}
+      },
+      "id": "supabase-update",
+      "name": "Supabase - Update Product",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1000, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, product_id: $('Webhook').first().json.body.product_id }) }}"
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "products",
+        "filters": {
+          "conditions": [
+            {
+              "column": "id",
+              "value": "={{ $('Webhook').first().json.body.product_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "string": [
+              {
+                "column": "status",
+                "value": "error"
+              }
+            ]
+          }
+        },
+        "options": {}
+      },
+      "id": "supabase-error",
+      "name": "Supabase - Mark Error",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1000, 500],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: $json.message || 'Unknown error' }) }}"
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1250, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Identify Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Identify Product": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Update Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Update Product": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Mark Error": {
+      "main": [
+        [
+          {
+            "node": "Respond Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": ""
+  },
+  "pinData": {}
+}

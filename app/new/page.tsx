@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/app/utils/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowRight, Sparkles, Loader2 } from "lucide-react"
+import { ArrowRight, Sparkles, Loader2, Wifi, WifiOff } from "lucide-react"
+import { useProductWebSocket } from "@/app/hooks/useProductWebSocket"
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -16,6 +17,15 @@ export default function NewProductPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [productName, setProductName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // WebSocket connection for real-time updates
+  const { status: wsStatus, submitProduct, isConnected } = useProductWebSocket({
+    userId: user?.id || null,
+    onProductUpdate: useCallback((update) => {
+      console.log('Product update received:', update)
+      // Handle updates here if needed (e.g., show toast notifications)
+    }, [])
+  })
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,8 +54,7 @@ export default function NewProductPage() {
     setIsSubmitting(true)
 
     try {
-      // For now, just create a basic product entry
-      // Later we'll add the AI identification agent
+      // Create product entry with pending status
       const { data, error } = await supabase
         .from('products')
         .insert({
@@ -58,12 +67,33 @@ export default function NewProductPage() {
 
       if (error) throw error
 
+      // Submit via WebSocket if connected, otherwise fall back to direct webhook
+      if (isConnected) {
+        submitProduct(data.id, productName.trim())
+      } else {
+        // Fallback: Trigger n8n webhook directly
+        const webhookUrl = process.env.NEXT_PUBLIC_N8N_PRODUCT_IDENTIFIER_WEBHOOK
+        if (webhookUrl) {
+          fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              product_id: data.id,
+              user_id: user.id,
+              product_name: productName.trim()
+            })
+          }).catch(err => {
+            console.error('Failed to trigger product identification:', err)
+          })
+        }
+      }
+
       // Redirect to the product page
       router.push(`/products/${data.id}`)
     } catch (error) {
       console.error('Failed to create product:', error)
-      // For now, just log the error
-      // TODO: Show error toast
       setIsSubmitting(false)
     }
   }
@@ -132,6 +162,23 @@ export default function NewProductPage() {
               </form>
             </CardContent>
           </Card>
+
+          {/* Connection status indicator */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {isConnected ? (
+              <>
+                <Wifi className="w-4 h-4 text-green-500" />
+                <span className="text-sm text-green-600 font-manrope">Real-time updates active</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-400 font-manrope">
+                  {wsStatus === 'connecting' ? 'Connecting...' : 'Using standard updates'}
+                </span>
+              </>
+            )}
+          </div>
 
           {/* Help text */}
           <p className="text-center text-sm text-gray-400 mt-6 font-manrope">

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  crewai-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crewai-product-research
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY}
+      - PORT=8000
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - cramler-network
+
+networks:
+  cramler-network:
+    driver: bridge
