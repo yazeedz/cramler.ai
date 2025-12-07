@@ -82,9 +82,12 @@ export function useProductWebSocket({ userId, onProductUpdate }: UseProductWebSo
         }
       };
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setStatus('error');
+      ws.onerror = () => {
+        // Only set error status if we're not already connected
+        // The onerror event can fire during connection attempts even if it succeeds afterward
+        if (wsRef.current?.readyState !== WebSocket.OPEN) {
+          setStatus('error');
+        }
       };
 
     } catch (error) {

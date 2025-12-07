@@ -10,6 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.WS_SERVER_PORT || 3001;
 const N8N_WEBHOOK_URL = process.env.N8N_PRODUCT_WEBHOOK_URL || 'http://localhost:5678/webhook/product-lookup';
+const N8N_BRAND_WEBHOOK_URL = process.env.N8N_BRAND_WEBHOOK_URL || 'http://localhost:5678/webhook/brand-research';
+const N8N_COMPETITOR_WEBHOOK_URL = process.env.N8N_COMPETITOR_WEBHOOK_URL || 'http://localhost:5678/webhook/competitor-research';
 
 // Middleware
 app.use(cors());
@@ -28,6 +30,21 @@ const userConnections = new Map<string, Set<WebSocket>>();
 const pendingRequests = new Map<string, {
   userId: string;
   productName: string;
+  timestamp: number;
+}>();
+
+// Store pending brand research requests
+const pendingBrandRequests = new Map<string, {
+  userId: string;
+  websiteUrl: string;
+  brandName?: string;
+  timestamp: number;
+}>();
+
+// Store pending competitor research requests
+const pendingCompetitorRequests = new Map<string, {
+  userId: string;
+  brandName: string;
   timestamp: number;
 }>();
 
@@ -116,6 +133,129 @@ wss.on('connection', (ws: WebSocket) => {
           }
           break;
 
+        case 'RESEARCH_BRAND':
+          // Handle brand research request
+          if (!userId) {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              message: 'Not authenticated'
+            }));
+            return;
+          }
+
+          const { requestId, websiteUrl, brandName } = message;
+
+          // Store the pending request
+          pendingBrandRequests.set(requestId, {
+            userId,
+            websiteUrl,
+            brandName,
+            timestamp: Date.now()
+          });
+
+          // Acknowledge receipt
+          ws.send(JSON.stringify({
+            type: 'BRAND_RESEARCH_STARTED',
+            requestId,
+            status: 'researching'
+          }));
+
+          // Trigger n8n brand research workflow
+          try {
+            const response = await fetch(N8N_BRAND_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                website_url: websiteUrl,
+                brand_name: brandName,
+                user_id: userId,
+                request_id: requestId
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error(`n8n brand research webhook failed: ${response.status}`);
+            }
+
+            console.log(`Triggered n8n brand research workflow for ${websiteUrl}`);
+          } catch (error) {
+            console.error('Failed to trigger brand research:', error);
+            ws.send(JSON.stringify({
+              type: 'BRAND_RESEARCH_ERROR',
+              requestId,
+              error: 'Failed to start brand research'
+            }));
+            pendingBrandRequests.delete(requestId);
+          }
+          break;
+
+        case 'RESEARCH_COMPETITORS':
+          // Handle competitor research request
+          if (!userId) {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              message: 'Not authenticated'
+            }));
+            return;
+          }
+
+          const {
+            requestId: competitorRequestId,
+            brandName: competitorBrandName,
+            brandDescription,
+            industry,
+            topics
+          } = message;
+
+          // Store the pending request
+          pendingCompetitorRequests.set(competitorRequestId, {
+            userId,
+            brandName: competitorBrandName,
+            timestamp: Date.now()
+          });
+
+          // Acknowledge receipt
+          ws.send(JSON.stringify({
+            type: 'COMPETITOR_RESEARCH_STARTED',
+            requestId: competitorRequestId,
+            status: 'researching'
+          }));
+
+          // Trigger n8n competitor research workflow
+          try {
+            const response = await fetch(N8N_COMPETITOR_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                brand_name: competitorBrandName,
+                brand_description: brandDescription,
+                industry: industry,
+                topics: topics,
+                user_id: userId,
+                request_id: competitorRequestId
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error(`n8n competitor research webhook failed: ${response.status}`);
+            }
+
+            console.log(`Triggered n8n competitor research workflow for ${competitorBrandName}`);
+          } catch (error) {
+            console.error('Failed to trigger competitor research:', error);
+            ws.send(JSON.stringify({
+              type: 'COMPETITOR_RESEARCH_ERROR',
+              requestId: competitorRequestId,
+              error: 'Failed to start competitor research'
+            }));
+            pendingCompetitorRequests.delete(competitorRequestId);
+          }
+          break;
+
         default:
           console.log('Unknown message type:', message.type);
       }
@@ -179,12 +319,84 @@ app.post('/api/n8n-callback', (req, res) => {
   res.json({ success: true });
 });
 
+// API endpoint for n8n brand research callback
+app.post('/api/brand-research-callback', (req, res) => {
+  const { request_id, user_id, status, brandData, error } = req.body;
+
+  console.log(`Received brand research callback for request ${request_id}`);
+
+  // Find the user's connections and send the update
+  const connections = userConnections.get(user_id);
+
+  if (connections && connections.size > 0) {
+    const message = JSON.stringify({
+      type: status === 'error' ? 'BRAND_RESEARCH_ERROR' : 'BRAND_RESEARCH_COMPLETE',
+      requestId: request_id,
+      status,
+      data: brandData,
+      error
+    });
+
+    connections.forEach((ws) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(message);
+      }
+    });
+
+    console.log(`Sent brand research update to ${connections.size} connection(s) for user ${user_id}`);
+  } else {
+    console.log(`No active connections for user ${user_id}`);
+  }
+
+  // Clean up pending request
+  pendingBrandRequests.delete(request_id);
+
+  res.json({ success: true });
+});
+
+// API endpoint for n8n competitor research callback
+app.post('/api/competitor-research-callback', (req, res) => {
+  const { request_id, user_id, status, competitorData, error } = req.body;
+
+  console.log(`Received competitor research callback for request ${request_id}`);
+
+  // Find the user's connections and send the update
+  const connections = userConnections.get(user_id);
+
+  if (connections && connections.size > 0) {
+    const message = JSON.stringify({
+      type: status === 'error' ? 'COMPETITOR_RESEARCH_ERROR' : 'COMPETITOR_RESEARCH_COMPLETE',
+      requestId: request_id,
+      status,
+      data: competitorData,
+      error
+    });
+
+    connections.forEach((ws) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(message);
+      }
+    });
+
+    console.log(`Sent competitor research update to ${connections.size} connection(s) for user ${user_id}`);
+  } else {
+    console.log(`No active connections for user ${user_id}`);
+  }
+
+  // Clean up pending request
+  pendingCompetitorRequests.delete(request_id);
+
+  res.json({ success: true });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     connections: userConnections.size,
-    pendingRequests: pendingRequests.size
+    pendingProductRequests: pendingRequests.size,
+    pendingBrandRequests: pendingBrandRequests.size,
+    pendingCompetitorRequests: pendingCompetitorRequests.size
   });
 });
 

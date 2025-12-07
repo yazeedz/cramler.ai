@@ -2,76 +2,257 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   PanelLeft,
   PanelLeftClose,
   PanelLeftOpen,
   ChevronDown,
-  PlusCircle,
+  LayoutDashboard,
+  Lightbulb,
   Package,
+  Settings,
+  Check,
+  Plus,
+  Building2,
   Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import ProfileMenu from "@/components/sidebar/profile-menu"
-import { createClient } from "@/app/utils/supabase/client"
+import { useUserContextValue } from "@/app/providers/UserContextProvider"
 
-// Navigation items (static)
-const navigationItems = [
-  { title: "New Product", url: "/new", icon: PlusCircle },
+// Navigation items
+const mainNavItems = [
+  { title: "Overview", url: "/overview", icon: LayoutDashboard },
+  { title: "Insights", url: "/insights", icon: Lightbulb },
+  { title: "Products", url: "/products", icon: Package },
 ]
 
-// Product type
-interface Product {
-  id: string
-  name: string
-  status: string
+const settingsNavItems = [
+  { title: "Settings", url: "/settings", icon: Settings },
+]
+
+function OrgBrandSelector({ isCollapsed }: { isCollapsed: boolean }) {
+  const {
+    organizations,
+    brands,
+    currentOrganization,
+    currentBrand,
+    switchOrganization,
+    switchBrand,
+    isLoading,
+  } = useUserContextValue()
+
+  if (isLoading) {
+    return (
+      <div className={cn(
+        "px-3 py-3 border-b border-gray-200",
+        isCollapsed && "px-2"
+      )}>
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-text-400" />
+          {!isCollapsed && <span className="text-sm text-text-400">Loading...</span>}
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentOrganization) {
+    return (
+      <div className={cn(
+        "px-3 py-3 border-b border-gray-200",
+        isCollapsed && "px-2"
+      )}>
+        {!isCollapsed && (
+          <Button variant="outline" size="sm" className="w-full justify-start">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Organization
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn(
+      "border-b border-gray-200",
+      isCollapsed ? "px-2 py-3" : "px-3 py-3"
+    )}>
+      {isCollapsed ? (
+        // Collapsed state - show org icon only
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              title={`${currentOrganization.name} / ${currentBrand?.name || 'Select brand'}`}
+            >
+              {currentOrganization.logo_url ? (
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={currentOrganization.logo_url} alt={currentOrganization.name} />
+                  <AvatarFallback className="text-xs bg-bg-300">
+                    {currentOrganization.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <Building2 className="h-4 w-4 text-text-400" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuLabel>Organization</DropdownMenuLabel>
+            {organizations.map((org) => (
+              <DropdownMenuItem
+                key={org.id}
+                onClick={() => switchOrganization(org.id)}
+              >
+                {org.id === currentOrganization.id && (
+                  <Check className="h-4 w-4 mr-2" />
+                )}
+                <span className={org.id !== currentOrganization.id ? "ml-6" : ""}>
+                  {org.name}
+                </span>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Brand</DropdownMenuLabel>
+            {brands.map((brand) => (
+              <DropdownMenuItem
+                key={brand.id}
+                onClick={() => switchBrand(brand.id)}
+              >
+                {brand.id === currentBrand?.id && (
+                  <Check className="h-4 w-4 mr-2" />
+                )}
+                <span className={brand.id !== currentBrand?.id ? "ml-6" : ""}>
+                  {brand.name}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        // Expanded state - show org name and brand selector
+        <div className="space-y-2">
+          {/* Organization Name */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 w-full text-left group hover:bg-bg-300 rounded-md px-2 py-1.5 transition-colors">
+                {currentOrganization.logo_url ? (
+                  <Avatar className="h-5 w-5 flex-shrink-0">
+                    <AvatarImage src={currentOrganization.logo_url} alt={currentOrganization.name} />
+                    <AvatarFallback className="text-xs bg-bg-300">
+                      {currentOrganization.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Building2 className="h-4 w-4 text-text-400 flex-shrink-0" />
+                )}
+                <span className="text-sm font-semibold text-gray-900 truncate font-manrope flex-1">
+                  {currentOrganization.name}
+                </span>
+                <ChevronDown className="h-3 w-3 text-text-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Organizations</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {organizations.map((org) => (
+                <DropdownMenuItem
+                  key={org.id}
+                  onClick={() => switchOrganization(org.id)}
+                  className="cursor-pointer"
+                >
+                  {org.id === currentOrganization.id && (
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                  )}
+                  <span className={org.id !== currentOrganization.id ? "ml-6" : ""}>
+                    {org.name}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Organization
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Brand Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 w-full text-left group hover:bg-bg-300 rounded-md px-2 py-1.5 transition-colors">
+                {currentBrand?.logo_url ? (
+                  <Avatar className="h-5 w-5 flex-shrink-0">
+                    <AvatarImage src={currentBrand.logo_url} alt={currentBrand.name} />
+                    <AvatarFallback className="text-xs bg-bg-300">
+                      {currentBrand.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <div className="h-5 w-5 rounded bg-gradient-to-br from-accent-main-100 to-accent-main-200 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-bold text-accent-main-500">
+                      {currentBrand?.name?.charAt(0).toUpperCase() || "?"}
+                    </span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-700 truncate font-manrope flex-1">
+                  {currentBrand?.name || "Select brand"}
+                </span>
+                <ChevronDown className="h-3 w-3 text-text-400" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Brands in {currentOrganization.name}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {brands.length === 0 ? (
+                <DropdownMenuItem disabled>
+                  <span className="text-text-400">No brands yet</span>
+                </DropdownMenuItem>
+              ) : (
+                brands.map((brand) => (
+                  <DropdownMenuItem
+                    key={brand.id}
+                    onClick={() => switchBrand(brand.id)}
+                    className="cursor-pointer"
+                  >
+                    {brand.id === currentBrand?.id && (
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                    )}
+                    <span className={brand.id !== currentBrand?.id ? "ml-6" : ""}>
+                      {brand.name}
+                    </span>
+                  </DropdownMenuItem>
+                ))
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Brand
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+    </div>
+  )
 }
 
 function AppSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsCollapsed: (collapsed: boolean) => void }) {
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [products, setProducts] = useState<Product[]>([])
-  const [productsLoading, setProductsLoading] = useState(true)
-  const supabase = createClient()
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setIsLoading(false)
-    }
-    getUser()
-  }, [supabase.auth])
-
-  // Fetch user's products
-  useEffect(() => {
-    const fetchProducts = async () => {
-      if (!user) return
-
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('id, name, status')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-
-        if (error) throw error
-        setProducts(data || [])
-      } catch (error) {
-        console.error('Failed to fetch products:', error)
-      } finally {
-        setProductsLoading(false)
-      }
-    }
-
-    if (user) {
-      fetchProducts()
-    }
-  }, [user, supabase])
+  const { user, isLoading } = useUserContextValue()
 
   // Extract user info
   const email = user?.email || ""
@@ -101,39 +282,32 @@ function AppSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; set
       "fixed inset-y-0 left-0 z-[100] w-72",
       isCollapsed ? "-translate-x-full" : "translate-x-0"
     )}>
-      {/* Header with Logo */}
-      <div className="flex h-14 items-center border-gray-200 px-2">
-        <div className="flex items-center overflow-hidden">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0 text-text-400 hover:text-text-500 group relative flex-shrink-0"
-          >
-            <PanelLeft className="h-4 w-4 shrink-0 opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-80 transition-all absolute" />
-            {isCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4 shrink-0 opacity-0 scale-80 group-hover:opacity-100 group-hover:scale-100 transition-all absolute" />
-            ) : (
-              <PanelLeftClose className="h-4 w-4 shrink-0 opacity-0 scale-80 group-hover:opacity-100 group-hover:scale-100 transition-all absolute" />
-            )}
-          </Button>
-          <div className={cn(
-            "transition-all duration-200 ease-in-out overflow-hidden ml-0",
-            isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-          )}>
-            <Link href="/new">
-              <span className="text-lg font-semibold text-gray-900 whitespace-nowrap tracking-wide font-lora">Cramler</span>
-            </Link>
-          </div>
-        </div>
+      {/* Header with collapse button */}
+      <div className="flex h-12 items-center border-b border-gray-200 px-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="h-8 w-8 p-0 text-text-400 hover:text-text-500 group relative flex-shrink-0"
+        >
+          <PanelLeft className="h-4 w-4 shrink-0 opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-80 transition-all absolute" />
+          {isCollapsed ? (
+            <PanelLeftOpen className="h-4 w-4 shrink-0 opacity-0 scale-80 group-hover:opacity-100 group-hover:scale-100 transition-all absolute" />
+          ) : (
+            <PanelLeftClose className="h-4 w-4 shrink-0 opacity-0 scale-80 group-hover:opacity-100 group-hover:scale-100 transition-all absolute" />
+          )}
+        </Button>
       </div>
 
+      {/* Org/Brand Selector */}
+      <OrgBrandSelector isCollapsed={isCollapsed} />
+
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-1">
-        {/* Navigation Items */}
-        <nav className="space-y-1 px-2 mb-4">
-          {navigationItems.map((item) => {
-            const isActive = pathname === item.url
+      <div className="flex-1 overflow-y-auto py-2">
+        {/* Main Navigation */}
+        <nav className="space-y-1 px-2">
+          {mainNavItems.map((item) => {
+            const isActive = pathname === item.url || pathname.startsWith(item.url + '/')
             return (
               <Link
                 key={item.title}
@@ -143,7 +317,7 @@ function AppSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; set
                   "flex items-center rounded-lg py-2 text-sm font-medium transition-all duration-200 relative overflow-hidden",
                   isActive
                     ? "bg-bg-400 text-gray-900"
-                    : "text-gray-700 hover:bg-bg-400 hover:text-gray-900"
+                    : "text-gray-700 hover:bg-bg-300 hover:text-gray-900"
                 )}
                 title={isCollapsed ? item.title : undefined}
               >
@@ -161,83 +335,42 @@ function AppSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; set
           })}
         </nav>
 
-        {/* Products Section */}
-        <div className="mb-4">
-          <div className={cn(
-            "px-3 mb-2 transition-all duration-200",
-            isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
-          )}>
-            <span className="text-xs font-medium text-text-400 uppercase tracking-wider font-manrope">
-              Products
-            </span>
-          </div>
-
+        {/* Settings Section */}
+        <div className="mt-6">
           <nav className="space-y-1 px-2">
-            {productsLoading ? (
-              <div className={cn(
-                "flex items-center py-2 text-sm text-gray-400",
-                isCollapsed && "justify-center"
-              )}>
-                <div className="flex h-5 w-8 items-center justify-center flex-shrink-0">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-                <span className={cn(
-                  "transition-all duration-200 ease-in-out ml-0 overflow-hidden font-manrope",
-                  isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                )}>
-                  Loading...
-                </span>
-              </div>
-            ) : products.length === 0 ? (
-              <div className={cn(
-                "flex items-center py-2 text-sm text-gray-400",
-                isCollapsed && "justify-center"
-              )}>
-                <div className="flex h-5 w-8 items-center justify-center flex-shrink-0">
-                  <Package className="h-4 w-4" />
-                </div>
-                <span className={cn(
-                  "transition-all duration-200 ease-in-out ml-0 overflow-hidden font-manrope",
-                  isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                )}>
-                  No products yet
-                </span>
-              </div>
-            ) : (
-              products.map((product) => {
-                const isActive = pathname === `/products/${product.id}`
-                return (
-                  <Link
-                    key={product.id}
-                    href={`/products/${product.id}`}
-                    onClick={handleNavigationClick}
-                    className={cn(
-                      "flex items-center rounded-lg py-2 text-sm font-medium transition-all duration-200 relative overflow-hidden",
-                      isActive
-                        ? "bg-bg-400 text-gray-900"
-                        : "text-gray-700 hover:bg-bg-400 hover:text-gray-900"
-                    )}
-                    title={isCollapsed ? product.name : undefined}
-                  >
-                    <div className="flex h-5 w-8 items-center justify-center flex-shrink-0">
-                      <Package className={cn("h-4 w-4", isActive && "text-gray-600")} />
-                    </div>
-                    <div className={cn(
-                      "transition-all duration-200 ease-in-out ml-0 overflow-hidden flex-1 min-w-0",
-                      isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                    )}>
-                      <span className="truncate whitespace-nowrap tracking-wide font-manrope block">{product.name}</span>
-                    </div>
-                  </Link>
-                )
-              })
-            )}
+            {settingsNavItems.map((item) => {
+              const isActive = pathname === item.url || pathname.startsWith(item.url + '/')
+              return (
+                <Link
+                  key={item.title}
+                  href={item.url}
+                  onClick={handleNavigationClick}
+                  className={cn(
+                    "flex items-center rounded-lg py-2 text-sm font-medium transition-all duration-200 relative overflow-hidden",
+                    isActive
+                      ? "bg-bg-400 text-gray-900"
+                      : "text-gray-700 hover:bg-bg-300 hover:text-gray-900"
+                  )}
+                  title={isCollapsed ? item.title : undefined}
+                >
+                  <div className="flex h-5 w-8 items-center justify-center flex-shrink-0">
+                    <item.icon className={cn("h-4 w-4", isActive && "text-gray-600")} />
+                  </div>
+                  <div className={cn(
+                    "transition-all duration-200 ease-in-out ml-0 overflow-hidden",
+                    isCollapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
+                  )}>
+                    <span className="truncate whitespace-nowrap tracking-wide font-manrope">{item.title}</span>
+                  </div>
+                </Link>
+              )
+            })}
           </nav>
         </div>
       </div>
 
       {/* User Profile */}
-      <div className="border-gray-200 pb-3 px-2">
+      <div className="border-t border-gray-200 pb-3 pt-3 px-2">
         <ProfileMenu
           displayName={displayName}
           userInitials={userInitials}

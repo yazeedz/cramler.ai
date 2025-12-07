@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from product_crew import research_product, ProductInfo
+from brand_crew import research_brand, BrandInfo
+from competitor_crew import research_competitors, CompetitorAnalysis
 
 # Load environment variables
 load_dotenv()
@@ -109,6 +111,171 @@ async def research_product_simple(request: ProductResearchRequest):
                 "what_it_does": product_info.what_it_does,
                 "main_difference": product_info.main_difference,
                 "status": "ready"
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class BrandResearchRequest(BaseModel):
+    """Request model for brand research"""
+    website_url: str
+    brand_name: Optional[str] = None
+    user_id: str
+    callback_url: Optional[str] = None
+
+
+class BrandResearchResponse(BaseModel):
+    """Response model for brand research"""
+    success: bool
+    data: Optional[BrandInfo] = None
+    error: Optional[str] = None
+
+
+@app.post("/brand/research", response_model=BrandResearchResponse)
+async def research_brand_endpoint(request: BrandResearchRequest):
+    """
+    Research a brand from their website using CrewAI.
+
+    The agent will:
+    1. Fetch and analyze the website content
+    2. Search for additional brand information if needed
+    3. Extract brand description, values, and suggested topics
+    """
+    try:
+        # Run CrewAI brand research
+        brand_info = research_brand(request.website_url, request.brand_name)
+
+        return BrandResearchResponse(
+            success=True,
+            data=brand_info
+        )
+
+    except Exception as e:
+        return BrandResearchResponse(
+            success=False,
+            error=str(e)
+        )
+
+
+@app.post("/brand/research/simple")
+async def research_brand_simple(request: BrandResearchRequest):
+    """
+    Simplified brand research endpoint that returns data in n8n-compatible format.
+    The agent autonomously analyzes the brand website.
+    """
+    try:
+        # Run CrewAI brand research
+        brand_info = research_brand(request.website_url, request.brand_name)
+
+        # Return in format expected by n8n workflow
+        return {
+            "website_url": request.website_url,
+            "brand_name": request.brand_name,
+            "user_id": request.user_id,
+            "callback_url": request.callback_url,
+            "brandData": {
+                "name": brand_info.name,
+                "description": brand_info.description or "",
+                "tagline": brand_info.tagline,
+                "industry": brand_info.industry,
+                "target_audience": brand_info.target_audience,
+                "key_products": brand_info.key_products,
+                "brand_values": brand_info.brand_values,
+                "unique_selling_points": brand_info.unique_selling_points,
+                "tone_of_voice": brand_info.tone_of_voice,
+                "suggested_topics": brand_info.suggested_topics or []
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class CompetitorResearchRequest(BaseModel):
+    """Request model for competitor research"""
+    brand_name: str
+    brand_description: str
+    industry: str
+    topics: list[str]
+    user_id: str
+    request_id: Optional[str] = None
+    callback_url: Optional[str] = None
+
+
+class CompetitorResearchResponse(BaseModel):
+    """Response model for competitor research"""
+    success: bool
+    data: Optional[CompetitorAnalysis] = None
+    error: Optional[str] = None
+
+
+@app.post("/competitors/research", response_model=CompetitorResearchResponse)
+async def research_competitors_endpoint(request: CompetitorResearchRequest):
+    """
+    Research competitors for a brand using CrewAI.
+
+    The agent will:
+    1. Search for direct competitors
+    2. Search for alternative solutions
+    3. Analyze the competitive landscape
+    """
+    try:
+        competitor_analysis = research_competitors(
+            brand_name=request.brand_name,
+            brand_description=request.brand_description,
+            industry=request.industry,
+            topics=request.topics
+        )
+
+        return CompetitorResearchResponse(
+            success=True,
+            data=competitor_analysis
+        )
+
+    except Exception as e:
+        return CompetitorResearchResponse(
+            success=False,
+            error=str(e)
+        )
+
+
+@app.post("/competitors/research/simple")
+async def research_competitors_simple(request: CompetitorResearchRequest):
+    """
+    Simplified competitor research endpoint that returns data in n8n-compatible format.
+    """
+    try:
+        competitor_analysis = research_competitors(
+            brand_name=request.brand_name,
+            brand_description=request.brand_description,
+            industry=request.industry,
+            topics=request.topics
+        )
+
+        # Return in format expected by n8n workflow
+        return {
+            "brand_name": request.brand_name,
+            "user_id": request.user_id,
+            "request_id": request.request_id,
+            "callback_url": request.callback_url,
+            "competitorData": {
+                "brand_name": competitor_analysis.brand_name,
+                "industry": competitor_analysis.industry,
+                "competitors": [
+                    {
+                        "name": c.name,
+                        "website": c.website,
+                        "description": c.description,
+                        "similarity_reason": c.similarity_reason,
+                        "strengths": c.strengths or [],
+                        "target_audience": c.target_audience
+                    }
+                    for c in competitor_analysis.competitors
+                ],
+                "market_position": competitor_analysis.market_position,
+                "competitive_landscape": competitor_analysis.competitive_landscape
             }
         }
 
