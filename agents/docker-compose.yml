@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # CrewAI Product Research Agent
   crewai-agent:
