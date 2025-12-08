@@ -36,10 +36,10 @@ services:
       - "3001:3001"
     environment:
       - WS_SERVER_PORT=3001
-      - N8N_PRODUCT_WEBHOOK_URL=http://n8n:5678/webhook/product-lookup
-      - N8N_BRAND_WEBHOOK_URL=http://n8n:5678/webhook/brand-research
-      - N8N_COMPETITOR_WEBHOOK_URL=http://n8n:5678/webhook/competitor-research
-      - N8N_PROMPT_GENERATION_WEBHOOK_URL=http://n8n:5678/webhook/generate-prompts
+      - N8N_PRODUCT_WEBHOOK_URL=https://n8n.cramler.ai/webhook/product-lookup
+      - N8N_BRAND_WEBHOOK_URL=https://n8n.cramler.ai/webhook/brand-research
+      - N8N_COMPETITOR_WEBHOOK_URL=https://n8n.cramler.ai/webhook/competitor-research
+      - N8N_PROMPT_GENERATION_WEBHOOK_URL=https://n8n.cramler.ai/webhook/generate-prompts
       - CREWAI_URL=http://crewai-agent:8000
     env_file:
       - ../server/.env
@@ -47,7 +47,6 @@ services:
     networks:
       - cramler-network
     depends_on:
-      - n8n
       - crewai-agent
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
@@ -56,33 +55,33 @@ services:
       retries: 3
       start_period: 5s
 
-  # n8n Workflow Automation
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: cramler-n8n
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:5678/
-      - GENERIC_TIMEZONE=UTC
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    env_file:
-      - .env
-    volumes:
-      - n8n_data:/home/node/.n8n
-    restart: unless-stopped
-    networks:
-      - cramler-network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+  # # n8n Workflow Automation
+  # n8n:
+  #   image: n8nio/n8n:latest
+  #   container_name: cramler-n8n
+  #   ports:
+  #     - "5678:5678"
+  #   environment:
+  #     - N8N_BASIC_AUTH_ACTIVE=false
+  #     - N8N_HOST=localhost
+  #     - N8N_PORT=5678
+  #     - N8N_PROTOCOL=http
+  #     - WEBHOOK_URL=http://localhost:5678/
+  #     - GENERIC_TIMEZONE=UTC
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - n8n_data:/home/node/.n8n
+  #   restart: unless-stopped
+  #   networks:
+  #     - cramler-network
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 10s
 
 networks:
   cramler-network:
