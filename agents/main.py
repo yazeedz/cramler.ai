@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from product_crew import research_product, ProductInfo
 from brand_crew import research_brand, BrandInfo
 from competitor_crew import research_competitors, CompetitorAnalysis
+from prompt_crew import generate_prompts_fast, generate_prompts_for_brand, PromptGenerationResult
 
 # Load environment variables
 load_dotenv()
@@ -276,6 +277,136 @@ async def research_competitors_simple(request: CompetitorResearchRequest):
                 ],
                 "market_position": competitor_analysis.market_position,
                 "competitive_landscape": competitor_analysis.competitive_landscape
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class PromptGenerationRequest(BaseModel):
+    """Request model for prompt generation"""
+    brand_id: str
+    brand_name: str
+    brand_description: str
+    topics: list[str] = []
+    competitors: list[str] = []
+    user_id: str
+    organization_id: str
+    num_topics: int = 5
+    prompts_per_topic: int = 5
+    use_fast_mode: bool = True  # Use fast OpenAI API instead of CrewAI
+    callback_url: Optional[str] = None
+
+
+class PromptGenerationResponse(BaseModel):
+    """Response model for prompt generation"""
+    success: bool
+    brand_id: str
+    data: Optional[PromptGenerationResult] = None
+    error: Optional[str] = None
+
+
+@app.post("/prompts/generate", response_model=PromptGenerationResponse)
+async def generate_prompts_endpoint(request: PromptGenerationRequest):
+    """
+    Generate research topics and prompts for AI visibility tracking.
+
+    The agent will:
+    1. Analyze the brand description and industry topics
+    2. Generate relevant research topics
+    3. Create consumer-style prompts for each topic
+    4. Return structured data for storage in Supabase
+    """
+    try:
+        # Choose generation method based on request
+        if request.use_fast_mode:
+            result = generate_prompts_fast(
+                brand_name=request.brand_name,
+                brand_description=request.brand_description,
+                topics=request.topics,
+                competitors=request.competitors,
+                num_topics=request.num_topics,
+                prompts_per_topic=request.prompts_per_topic
+            )
+        else:
+            result = generate_prompts_for_brand(
+                brand_name=request.brand_name,
+                brand_description=request.brand_description,
+                topics=request.topics,
+                competitors=request.competitors,
+                num_topics=request.num_topics,
+                prompts_per_topic=request.prompts_per_topic
+            )
+
+        return PromptGenerationResponse(
+            success=True,
+            brand_id=request.brand_id,
+            data=result
+        )
+
+    except Exception as e:
+        return PromptGenerationResponse(
+            success=False,
+            brand_id=request.brand_id,
+            error=str(e)
+        )
+
+
+@app.post("/prompts/generate/simple")
+async def generate_prompts_simple(request: PromptGenerationRequest):
+    """
+    Simplified prompt generation endpoint that returns data in n8n-compatible format.
+    This is designed to be used in n8n workflows for storing in Supabase.
+    """
+    try:
+        # Choose generation method based on request
+        if request.use_fast_mode:
+            result = generate_prompts_fast(
+                brand_name=request.brand_name,
+                brand_description=request.brand_description,
+                topics=request.topics,
+                competitors=request.competitors,
+                num_topics=request.num_topics,
+                prompts_per_topic=request.prompts_per_topic
+            )
+        else:
+            result = generate_prompts_for_brand(
+                brand_name=request.brand_name,
+                brand_description=request.brand_description,
+                topics=request.topics,
+                competitors=request.competitors,
+                num_topics=request.num_topics,
+                prompts_per_topic=request.prompts_per_topic
+            )
+
+        # Return in format expected by n8n workflow for Supabase storage
+        return {
+            "brand_id": request.brand_id,
+            "brand_name": request.brand_name,
+            "user_id": request.user_id,
+            "organization_id": request.organization_id,
+            "callback_url": request.callback_url,
+            "generation_result": {
+                "brand_name": result.brand_name,
+                "industry": result.industry,
+                "total_prompts": result.total_prompts,
+                "topics": [
+                    {
+                        "name": topic.name,
+                        "slug": topic.slug,
+                        "description": topic.description,
+                        "prompts": [
+                            {
+                                "prompt_text": prompt.prompt_text,
+                                "intent": prompt.intent,
+                                "expected_mentions": prompt.expected_mentions
+                            }
+                            for prompt in topic.prompts
+                        ]
+                    }
+                    for topic in result.topics
+                ]
             }
         }
 

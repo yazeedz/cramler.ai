@@ -12,6 +12,7 @@ const PORT = process.env.WS_SERVER_PORT || 3001;
 const N8N_WEBHOOK_URL = process.env.N8N_PRODUCT_WEBHOOK_URL || 'http://localhost:5678/webhook/product-lookup';
 const N8N_BRAND_WEBHOOK_URL = process.env.N8N_BRAND_WEBHOOK_URL || 'http://localhost:5678/webhook/brand-research';
 const N8N_COMPETITOR_WEBHOOK_URL = process.env.N8N_COMPETITOR_WEBHOOK_URL || 'http://localhost:5678/webhook/competitor-research';
+const N8N_PROMPT_GENERATION_WEBHOOK_URL = process.env.N8N_PROMPT_GENERATION_WEBHOOK_URL || 'http://localhost:5678/webhook/generate-prompts';
 
 // Middleware
 app.use(cors());
@@ -44,6 +45,14 @@ const pendingBrandRequests = new Map<string, {
 // Store pending competitor research requests
 const pendingCompetitorRequests = new Map<string, {
   userId: string;
+  brandName: string;
+  timestamp: number;
+}>();
+
+// Store pending prompt generation requests
+const pendingPromptGenerationRequests = new Map<string, {
+  userId: string;
+  brandId: string;
   brandName: string;
   timestamp: number;
 }>();
@@ -256,6 +265,82 @@ wss.on('connection', (ws: WebSocket) => {
           }
           break;
 
+        case 'GENERATE_PROMPTS':
+          // Handle prompt generation request
+          if (!userId) {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              message: 'Not authenticated'
+            }));
+            return;
+          }
+
+          const {
+            requestId: promptRequestId,
+            brandId,
+            brandName: promptBrandName,
+            brandDescription: promptBrandDescription,
+            topics: brandTopics,
+            competitors: brandCompetitors,
+            organizationId,
+            numTopics,
+            promptsPerTopic,
+            useFastMode
+          } = message;
+
+          // Store the pending request
+          pendingPromptGenerationRequests.set(promptRequestId, {
+            userId,
+            brandId,
+            brandName: promptBrandName,
+            timestamp: Date.now()
+          });
+
+          // Acknowledge receipt
+          ws.send(JSON.stringify({
+            type: 'PROMPT_GENERATION_STARTED',
+            requestId: promptRequestId,
+            status: 'generating'
+          }));
+
+          // Trigger n8n prompt generation workflow
+          try {
+            const response = await fetch(N8N_PROMPT_GENERATION_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                brand_id: brandId,
+                brand_name: promptBrandName,
+                brand_description: promptBrandDescription,
+                topics: brandTopics || [],
+                competitors: brandCompetitors || [],
+                user_id: userId,
+                organization_id: organizationId,
+                num_topics: numTopics || 5,
+                prompts_per_topic: promptsPerTopic || 5,
+                use_fast_mode: useFastMode !== false,
+                request_id: promptRequestId
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error(`n8n prompt generation webhook failed: ${response.status}`);
+            }
+
+            console.log(`Triggered n8n prompt generation workflow for brand ${promptBrandName}`);
+          } catch (error) {
+            console.error('Failed to trigger prompt generation:', error);
+            ws.send(JSON.stringify({
+              type: 'PROMPT_GENERATION_ERROR',
+              requestId: promptRequestId,
+              error: 'Failed to start prompt generation'
+            }));
+            pendingPromptGenerationRequests.delete(promptRequestId);
+          }
+          break;
+
         default:
           console.log('Unknown message type:', message.type);
       }
@@ -389,6 +474,43 @@ app.post('/api/competitor-research-callback', (req, res) => {
   res.json({ success: true });
 });
 
+// API endpoint for n8n prompt generation callback
+app.post('/api/prompt-generation-callback', (req, res) => {
+  const { request_id, user_id, brand_id, status, total_topics, total_prompts, error } = req.body;
+
+  console.log(`Received prompt generation callback for request ${request_id}`);
+
+  // Find the user's connections and send the update
+  const connections = userConnections.get(user_id);
+
+  if (connections && connections.size > 0) {
+    const message = JSON.stringify({
+      type: status === 'error' ? 'PROMPT_GENERATION_ERROR' : 'PROMPT_GENERATION_COMPLETE',
+      requestId: request_id,
+      brandId: brand_id,
+      status,
+      totalTopics: total_topics,
+      totalPrompts: total_prompts,
+      error
+    });
+
+    connections.forEach((ws) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(message);
+      }
+    });
+
+    console.log(`Sent prompt generation update to ${connections.size} connection(s) for user ${user_id}`);
+  } else {
+    console.log(`No active connections for user ${user_id}`);
+  }
+
+  // Clean up pending request
+  pendingPromptGenerationRequests.delete(request_id);
+
+  res.json({ success: true });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -396,7 +518,8 @@ app.get('/health', (req, res) => {
     connections: userConnections.size,
     pendingProductRequests: pendingRequests.size,
     pendingBrandRequests: pendingBrandRequests.size,
-    pendingCompetitorRequests: pendingCompetitorRequests.size
+    pendingCompetitorRequests: pendingCompetitorRequests.size,
+    pendingPromptGenerationRequests: pendingPromptGenerationRequests.size
   });
 });
 

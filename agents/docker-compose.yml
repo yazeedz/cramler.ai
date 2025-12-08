@@ -39,6 +39,7 @@ services:
       - N8N_PRODUCT_WEBHOOK_URL=http://n8n:5678/webhook/product-lookup
       - N8N_BRAND_WEBHOOK_URL=http://n8n:5678/webhook/brand-research
       - N8N_COMPETITOR_WEBHOOK_URL=http://n8n:5678/webhook/competitor-research
+      - N8N_PROMPT_GENERATION_WEBHOOK_URL=http://n8n:5678/webhook/generate-prompts
       - CREWAI_URL=http://crewai-agent:8000
     env_file:
       - ../server/.env
@@ -68,6 +69,9 @@ services:
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://localhost:5678/
       - GENERIC_TIMEZONE=UTC
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - .env
     volumes:
       - n8n_data:/home/node/.n8n
     restart: unless-stopped

@@ -25,6 +25,7 @@ export type Database = {
           website: string | null
           description: string | null
           similarity_reason: string | null
+          logo_url: string | null
         }
         Insert: {
           brand_id: string
@@ -36,6 +37,7 @@ export type Database = {
           website?: string | null
           description?: string | null
           similarity_reason?: string | null
+          logo_url?: string | null
         }
         Update: {
           brand_id?: string
@@ -47,10 +49,217 @@ export type Database = {
           website?: string | null
           description?: string | null
           similarity_reason?: string | null
+          logo_url?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "brand_competitors_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_research_prompts: {
+        Row: {
+          average_position: number | null
+          brand_id: string
+          citation_share: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          prompt_text: string
+          sort_order: number | null
+          topic_id: string
+          updated_at: string | null
+          visibility_rank: number | null
+          visibility_score: number | null
+        }
+        Insert: {
+          average_position?: number | null
+          brand_id: string
+          citation_share?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          prompt_text: string
+          sort_order?: number | null
+          topic_id: string
+          updated_at?: string | null
+          visibility_rank?: number | null
+          visibility_score?: number | null
+        }
+        Update: {
+          average_position?: number | null
+          brand_id?: string
+          citation_share?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          prompt_text?: string
+          sort_order?: number | null
+          topic_id?: string
+          updated_at?: string | null
+          visibility_rank?: number | null
+          visibility_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_research_prompts_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_research_prompts_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "brand_research_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_research_topics: {
+        Row: {
+          brand_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          prompt_count: number | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          prompt_count?: number | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          prompt_count?: number | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_research_topics_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitor_brand_visibility_reports: {
+        Row: {
+          id: string
+          competitor_id: string
+          brand_id: string
+          report_date: string
+          report_period: string | null
+          overall_visibility_score: number | null
+          visibility_change: number | null
+          chatgpt_score: number | null
+          claude_score: number | null
+          gemini_score: number | null
+          perplexity_score: number | null
+          copilot_score: number | null
+          total_mentions: number | null
+          mentions_change: number | null
+          first_choice_rate: number | null
+          recommendation_rate: number | null
+          share_of_voice: number | null
+          positive_mentions: number | null
+          neutral_mentions: number | null
+          negative_mentions: number | null
+          avg_sentiment_score: number | null
+          competitive_rank: number | null
+          generated_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          competitor_id: string
+          brand_id: string
+          report_date: string
+          report_period?: string | null
+          overall_visibility_score?: number | null
+          visibility_change?: number | null
+          chatgpt_score?: number | null
+          claude_score?: number | null
+          gemini_score?: number | null
+          perplexity_score?: number | null
+          copilot_score?: number | null
+          total_mentions?: number | null
+          mentions_change?: number | null
+          first_choice_rate?: number | null
+          recommendation_rate?: number | null
+          share_of_voice?: number | null
+          positive_mentions?: number | null
+          neutral_mentions?: number | null
+          negative_mentions?: number | null
+          avg_sentiment_score?: number | null
+          competitive_rank?: number | null
+          generated_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          competitor_id?: string
+          brand_id?: string
+          report_date?: string
+          report_period?: string | null
+          overall_visibility_score?: number | null
+          visibility_change?: number | null
+          chatgpt_score?: number | null
+          claude_score?: number | null
+          gemini_score?: number | null
+          perplexity_score?: number | null
+          copilot_score?: number | null
+          total_mentions?: number | null
+          mentions_change?: number | null
+          first_choice_rate?: number | null
+          recommendation_rate?: number | null
+          share_of_voice?: number | null
+          positive_mentions?: number | null
+          neutral_mentions?: number | null
+          negative_mentions?: number | null
+          avg_sentiment_score?: number | null
+          competitive_rank?: number | null
+          generated_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_brand_visibility_reports_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "brand_competitors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competitor_brand_visibility_reports_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
