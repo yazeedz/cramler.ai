@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     networks:
       - cramler-network
-      - shared-network
+      - n8n-hosting_default
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
       interval: 30s
